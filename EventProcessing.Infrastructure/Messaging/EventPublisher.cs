@@ -14,6 +14,8 @@ namespace EventProcessing.Infrastructure.Messaging
         private readonly ILogger<EventPublisher> _logger;
         private readonly string _hostName;
         private readonly string _queueName;
+        private readonly string _userName;
+        private readonly string _password;
 
         public EventPublisher(IConfiguration configuration, ILogger<EventPublisher> logger)
         {
@@ -23,18 +25,25 @@ namespace EventProcessing.Infrastructure.Messaging
             // Konfigürasyondan RabbitMQ ayarlarını alıyoruz, yoksa varsayılan atıyoruz
             _hostName = _configuration["RabbitMQ:HostName"] ?? "localhost";
             _queueName = _configuration["RabbitMQ:QueueName"] ?? "transaction_events";
+            _userName = _configuration["RabbitMQ:UserName"] ?? "guest";
+            _password = _configuration["RabbitMQ:Password"] ?? "guest";
         }
 
         public Task PublishBatchAsync(IEnumerable<TransactionEvent> events, CancellationToken cancellationToken = default)
         {
-            var factory = new ConnectionFactory { HostName = _hostName };
+            var factory = new ConnectionFactory
+            {
+                HostName = _hostName,
+                UserName = _userName,
+                Password = _password
+            };
 
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
             //yoksa yeniden oluştur
             channel.QueueDeclare(
                 queue: _queueName,
-                durable: true, 
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
@@ -46,7 +55,7 @@ namespace EventProcessing.Infrastructure.Messaging
                 var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(transactionEvent));
 
                 var properties = channel.CreateBasicProperties();
-                properties.Persistent = true; 
+                properties.Persistent = true;
 
                 batch.Add(exchange: string.Empty, routingKey: _queueName, mandatory: false, properties: properties, body: new ReadOnlyMemory<byte>(body));
             }
