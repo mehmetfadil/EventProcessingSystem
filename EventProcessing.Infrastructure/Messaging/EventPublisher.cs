@@ -40,13 +40,22 @@ namespace EventProcessing.Infrastructure.Messaging
 
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
-            //yoksa yeniden oluştur
+
+            // DLQ tanımı ve ana kuyruk — EventConsumer ile aynı argümanlar (çakışma olmaması için)
+            var dlqName = $"{_queueName}_dlq";
+            channel.QueueDeclare(queue: dlqName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+            var args = new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", "" },
+                { "x-dead-letter-routing-key", dlqName }
+            };
             channel.QueueDeclare(
                 queue: _queueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null);
+                arguments: args);
 
             var batch = channel.CreateBasicPublishBatch();
 

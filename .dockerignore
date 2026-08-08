@@ -1,0 +1,15 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/node_modules
+**/.dockerignore
+**/Dockerfile*
+**/*.user
+**/*.suo
+**/*.tmp
+**/packages
+**/.claude
+**/TestResults
+**/coverage
