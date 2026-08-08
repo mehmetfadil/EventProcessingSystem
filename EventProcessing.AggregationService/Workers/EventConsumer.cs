@@ -31,24 +31,51 @@ namespace EventProcessing.AggregationService.Workers
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             var hostName = _configuration["RabbitMQ:HostName"] ?? "localhost";
+            var userName = _configuration["RabbitMQ:UserName"] ?? "guest";
+            var password = _configuration["RabbitMQ:Password"] ?? "guest";
             _queueName = _configuration["RabbitMQ:QueueName"] ?? "transaction_events";
             _dlqName = $"{_queueName}_dlq";
 
-            var factory = new ConnectionFactory { HostName = hostName, DispatchConsumersAsync = true };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-
-            _channel.QueueDeclare(queue: _dlqName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-
-            var args = new Dictionary<string, object>
+            var factory = new ConnectionFactory
             {
-                { "x-dead-letter-exchange", "" },
-                { "x-dead-letter-routing-key", _dlqName }
+                HostName = hostName,
+                UserName = userName,
+                Password = password,
+                DispatchConsumersAsync = true,
+                AutomaticRecoveryEnabled = true,
+                NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
             };
 
-            _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: args);
+            // Bağlantı kopmasına karşı retry ile bağlan
+            const int maxRetries = 10;
+            for (int retry = 0; retry < maxRetries; retry++)
+            {
+                try
+                {
+                    _connection = factory.CreateConnection();
+                    _channel = _connection.CreateModel();
 
-            _channel.BasicQos(prefetchSize: 0, prefetchCount: 50, global: false);
+                    _channel.QueueDeclare(queue: _dlqName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+                    var args = new Dictionary<string, object>
+                    {
+                        { "x-dead-letter-exchange", "" },
+                        { "x-dead-letter-routing-key", _dlqName }
+                    };
+
+                    _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: args);
+                    _channel.BasicQos(prefetchSize: 0, prefetchCount: 50, global: false);
+
+                    _logger.LogInformation("RabbitMQ bağlantısı kuruldu. Queue: {Queue}", _queueName);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "RabbitMQ bağlantısı başarısız. Deneme {Try}/{Max}", retry + 1, maxRetries);
+                    if (retry == maxRetries - 1) throw;
+                    Thread.Sleep(2000 * (retry + 1));
+                }
+            }
 
             return base.StartAsync(cancellationToken);
         }
