@@ -1,11 +1,3 @@
-namespace TestProject1
+﻿namespace EventProcessing.UnitTests
 {
-    public class UnitTest1
-    {
-        [Fact]
-        public void Test1()
-        {
-
-        }
-    }
 }

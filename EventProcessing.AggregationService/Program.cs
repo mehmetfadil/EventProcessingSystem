@@ -3,8 +3,18 @@ using EventProcessing.Infrastructure;
 using EventProcessing.Infrastructure.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/aggregation-service-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 
@@ -47,4 +57,13 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "AggregationService başlatılamadı!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
