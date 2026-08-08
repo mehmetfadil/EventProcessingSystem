@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EventProcessing.AggregationService\EventProcessing.AggregationService.csproj" />
+    <ProjectReference Include="..\EventProcessing.Core\EventProcessing.Core.csproj" />
+    <ProjectReference Include="..\EventProcessing.Infrastructure\EventProcessing.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
