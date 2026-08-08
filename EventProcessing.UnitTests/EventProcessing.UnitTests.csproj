@@ -11,7 +11,11 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="NUnit" Version="4.1.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
@@ -20,6 +24,7 @@
     <ProjectReference Include="..\EventProcessing.AggregationService\EventProcessing.AggregationService.csproj" />
     <ProjectReference Include="..\EventProcessing.Core\EventProcessing.Core.csproj" />
     <ProjectReference Include="..\EventProcessing.Infrastructure\EventProcessing.Infrastructure.csproj" />
+    <ProjectReference Include="..\EventProcessing.IngestionApi\EventProcessing.IngestionApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

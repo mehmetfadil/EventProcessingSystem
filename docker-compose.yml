@@ -74,6 +74,33 @@ services:
       sqlserver:
         condition: service_healthy
 
+  unit-tests:
+    build:
+      context: .
+      dockerfile: EventProcessing.UnitTests/Dockerfile
+    container_name: event_unit_tests
+    profiles:
+      - test
+    networks:
+      - default
+
+  integration-tests:
+    build:
+      context: .
+      dockerfile: EventProcessing.IntegrationTests/Dockerfile
+    container_name: event_integration_tests
+    profiles:
+      - test
+    environment:
+      - TEST_CONNECTION_STRING=Server=sqlserver;Database=EventProcessingIntegrationTestDb;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - default
+
 volumes:
   rabbitmq_data:
   sqlserver_data:

@@ -5,8 +5,18 @@ using EventProcessing.IngestionApi.Validators;
 using FluentValidation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/ingestion-api-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 
@@ -50,4 +60,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "IngestionApi başlatılamadı!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
