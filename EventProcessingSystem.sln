@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessing.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessing.AggregationService", "EventProcessing.AggregationService\EventProcessing.AggregationService.csproj", "{15FB0C47-1431-400F-A5BE-0E5E6263A213}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessing.UnitTests", "TestProject1\EventProcessing.UnitTests.csproj", "{51E749C5-5EB1-4346-972C-6DB3F97852A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessing.UnitTests", "EventProcessing.UnitTests\EventProcessing.UnitTests.csproj", "{51E749C5-5EB1-4346-972C-6DB3F97852A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessing.IntegrationTests", "EventProcessing.IntegrationTests\EventProcessing.IntegrationTests.csproj", "{94225B29-938E-4F4C-81E4-798BED2E2991}"
 EndProject
