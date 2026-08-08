@@ -59,14 +59,19 @@ dotnet run --project EventProcessing.LoadGenerator
 
 ### Manuel test
 
-```powershell
-# Event gönder
-irm -Method POST -Uri http://localhost:5084/api/v1/events/batch `
-  -ContentType "application/json" `
-  -Body '[{"eventId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","customerId":"test-001","type":0,"amount":150.75,"currency":"TRY","occurredAt":"2026-08-08T10:00:00Z"}]'
+```bash
+# Event gönder (3 adet: 2 TRY + 1 USD)
+curl -X POST http://localhost:5084/api/v1/events/batch \
+  -H "Content-Type: application/json" \
+  -d '[
+    {"eventId":"a1b2c3d4-e5f6-7890-abcd-ef1234567890","customerId":"test-001","type":0,"amount":150.75,"currency":"TRY","occurredAt":"2026-08-08T10:00:00Z"},
+    {"eventId":"b2c3d4e5-f6a7-8901-bcde-f12345678901","customerId":"test-001","type":1,"amount":50.00,"currency":"TRY","occurredAt":"2026-08-08T14:00:00Z"},
+    {"eventId":"c3d4e5f6-a7b8-9012-cdef-123456789012","customerId":"test-002","type":0,"amount":200.00,"currency":"USD","occurredAt":"2026-08-08T09:00:00Z"}
+  ]'
 
 # Özet sorgula
-irm "http://localhost:5094/api/v1/customers/test-001/daily-summary?date=2026-08-08&currency=TRY"
+curl -X GET "http://localhost:5094/api/v1/customers/test-001/daily-summary?date=2026-08-08&currency=TRY"
+curl -X GET "http://localhost:5094/api/v1/customers/test-002/daily-summary?date=2026-08-08&currency=USD"
 ```
 
 ---
